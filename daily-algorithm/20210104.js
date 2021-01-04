@@ -32,54 +32,39 @@ RomanNumerals.fromRoman('M'); // should return 1000
 
 
 // TODO: create a RomanNumerals helper object
-const RomanNumerals = {
-    fromRoman: (rom) => {
-        if (typeof rom !== 'string') return;
-
-        switch (rom.toUpperCase()) {
-            case 'I': return 1;
-            case 'V': return 5;
-            case 'X': return 10;
-            case 'L': return 50;
-            case 'C': return 100;
-            case 'D': return 500;
-            case 'M': return 1000;
-        }
-    },
-
-    toRoman: (num) => {
-        if (typeof num !== 'number') return;
-        const numStrRev = num.toString().split('').reverse();
-
-        const getSymbols = (idx) => {
-
-            switch (idx) {
-                case 0: return { unit: 'I', half: 'V', nextUnit: 'X' };
-                case 1: return { unit: 'X', half: 'L', nextUnit: 'C' };
-                case 2: return { unit: 'C', half: 'D', nextUnit: 'M' };
-
-                default: return { unit: 'M', half: '', nextUnit: '' };
-            }
-        }
-
-        return numStrRev.map((curr, idx) => {
-            const { unit, half, nextUnit } = getSymbols(idx);
-
-            switch (curr) {
-                case '1': return `${unit}`;
-                case '2': return unit.repeat(2);
-                case '3': return unit.repeat(3);
-                case '4': return `${unit}${half}`;
-                case '5': return `${half}`;
-                case '6': return `${half}${unit}`
-                case '7': return `${half}${unit.repeat(2)}`
-                case '8': return `${half}${unit.repeat(3)}`;
-                case '9': return `${unit}${nextUnit}`;
-                default:
-                    return '';
-            }
-
-        }).reverse().join('');
+const dictionary = {
+    1: 'I',
+    5: 'V',
+    10: 'X',
+    50: 'L',
+    100: 'C',
+    500: 'D',
+    1000: 'M',
+    'I': 1,
+    'V': 5,
+    'X': 10,
+    'L': 50,
+    'C': 100,
+    'D': 500,
+    'M': 1000,
+}
+const analysis = {
+    0: [],
+    1: [1],
+    2: [1, 1],
+    3: [1, 1, 1],
+    4: [1, 5],
+    5: [5],
+    6: [5, 1],
+    7: [5, 1, 1],
+    8: [5, 1, 1, 1],
+    9: [1, 10],
+}
+class RomanNumerals {
+    static fromRoman(str) {
+        return str.split('').map(c => dictionary[c]).reduce((sum, val, index, arr) => sum += val >= ~~arr[index + 1] ? val : -val, 0);
     }
-
+    static toRoman(number) {
+        return String(number).split('').reduce((sum, i, c, arr) => [...sum, ...analysis[i].map(n => n * Math.pow(10, arr.length - 1 - c))], []).map(i => dictionary[i]).join('');
+    }
 }
